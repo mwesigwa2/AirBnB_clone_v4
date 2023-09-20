@@ -73,7 +73,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
+                    if pline[0] == '{' and pline[-1] == '}'\
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -113,36 +113,33 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-   def do_create(self, line):
-        """Creates a new instance of BaseModel, saves it
-        Exceptions:
-            SyntaxError: when there is no args given
-            NameError: when there is no object taht has the name
-        """
-        try:
-            if not line:
-                raise SyntaxError()
-            my_list = line.split(" ")
-            obj = eval("{}()".format(my_list[0]))
-
-            if len(my_list) > 1:
-                for index in range(1, len(my_list)):
-                    temp = my_list[index].split('=')
-                    if temp[1][0] == '"' and temp[1][-1] == '"':
-                        temp[1] = temp[1][1:-1]
-                        temp[1] = re.sub('"', '\\"', temp[1])
-                        temp[1] = re.sub('_', ' ', temp[1])
-                        setattr(obj, temp[0], temp[1])
-                    elif re.compile('^[+-]*?\d+$').match(temp[1]):
-                        setattr(obj, temp[0], int(temp[1]))
-                    elif re.compile('^[+-]*?\d+\.\d+$').match(temp[1]):
-                        setattr(obj, temp[0], float(temp[1]))
-            obj.save()
-            print("{}".format(obj.id))
-        except SyntaxError:
+    def do_create(self, args):
+        """ Create an object of any class"""
+        if len(args) == 0:
             print("** class name missing **")
+            return
+        try:
+            args = shlex.split(args)
+            new_instance = eval(args[0])()
+            for i in args[1:]:
+                try:
+                    key = i.split("=")[0]
+                    value = i.split("=")[1]
+                    if hasattr(new_instance, key) is True:
+                        value = value.replace("_", " ")
+                        try:
+                            value = eval(value)
+                        except (ValueError, SyntaxError, NameError):
+                            pass
+                        setattr(new_instance, key, value)
+                except (ValueError, IndexError):
+                    pass
+            new_instance.save()
+            print(new_instance.id)
         except NameError:
             print("** class doesn't exist **")
+            return
+   
 
     def help_create(self):
         """ Help information for the create method """
@@ -290,7 +287,7 @@ class HBNBCommand(cmd.Cmd):
                 args.append(v)
         else:  # isolate args
             args = args[2]
-            if args and args[0] is '\"':  # check for quoted arg
+            if args and args[0] == '\"':  # check for quoted arg
                 second_quote = args.find('\"', 1)
                 att_name = args[1:second_quote]
                 args = args[second_quote + 1:]
@@ -298,10 +295,10 @@ class HBNBCommand(cmd.Cmd):
             args = args.partition(' ')
 
             # if att_name was not quoted arg
-            if not att_name and args[0] is not ' ':
+            if not att_name and args[0] != ' ':
                 att_name = args[0]
             # check for quoted val arg
-            if args[2] and args[2][0] is '\"':
+            if args[2] and args[2][0] == '\"':
                 att_val = args[2][1:args[2].find('\"', 1)]
 
             # if att_val was not quoted arg
