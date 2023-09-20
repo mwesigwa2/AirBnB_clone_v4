@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""This is the user class"""
+"""user class"""
 from models.base_model import BaseModel, Base, Column, String
 from sqlalchemy.orm import relationship
 
@@ -7,8 +7,8 @@ from sqlalchemy.orm import relationship
 class User(BaseModel, Base):
     """This is the class for user
     Attributes:
-        email: email address
-        password: password for you login
+        email: email
+        password: passwordn
         first_name: first name
         last_name: last name
     """
