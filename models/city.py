@@ -1,7 +1,10 @@
 #!/usr/bin/python3
 """city class"""
-from models.base_model import BaseModel, Base, Column, String, ForeignKey
-from models.state import State
+from models.base_model import Base
+from models.base_model import BaseModel
+from sqlalchemy import Column
+from sqlalchemy import ForeignKey
+from sqlalchemy import String
 from sqlalchemy.orm import relationship
 
 
@@ -14,4 +17,4 @@ class City(BaseModel, Base):
     __tablename__ = 'cities'
     state_id = Column(String(60), ForeignKey(State.id), nullable=False)
     name = Column(String(128), nullable=False)
-    places = relationship("Place", backref="cities")
+    places = relationship("Place", backref="cities", cascade="delete")
