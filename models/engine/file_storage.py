@@ -36,7 +36,7 @@ class FileStorage:
         """Returns the dictionary of objects."""
         if not cls:
             return self.__objects
-        elif type(cls) == str:
+        elif isinstance(cls, str):
             return {key: value for key, value in self.__objects.items()
                     if value.__class__.__name__ == cls}
         else:
@@ -66,9 +66,14 @@ class FileStorage:
                     for obj_dict in obj_dict_list:
                         obj_class = class_dict[obj_dict["__class__"]]
                         obj_instance = obj_class(**obj_dict)
-                        self.__objects[obj_dict["__class__"] + "." + obj_dict["id"]] = obj_instance
+                        key = "{}.{}".format(
+                            obj_dict["__class__"],
+                            obj_dict["id"]
+                        )
+                        self.__objects[key] = obj_instance
             except Exception as e:
-                pass        
+                pass
+
     def delete(self, obj=None):
         """An instance that  deletes obj from __objects"""
         if obj is not None:
@@ -76,3 +81,7 @@ class FileStorage:
             if key in self.__objects:
                 del self.__objects[key]
                 self.save()
+
+    def close(self):
+        """deserializes JSON file to objects"""
+        self.reload()
