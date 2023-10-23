@@ -2,7 +2,7 @@
 from fabric.api import env, put, run
 import os
 
-env.hosts = ['100.25.34.61', '100.25.180.211']
+env.hosts = ['54.164.27.186', '52.86.142.105']
 env.user = 'ubuntu'
 env.key_filename = '~/.ssh/school'
 
@@ -29,6 +29,13 @@ def do_deploy(archive_path):
 
         # Delete the uploaded archive from the web servers
         run('sudo rm /tmp/{}'.format(archive_filename))
+
+        # move contents into -host web_static
+        rel_path = '/data/web_static/releases/{}/web_static/*'.format(archive_name)
+        run('sudo mv {} {}'.format(rel_path, release_path))
+
+        # remove extra web_static dir
+        run('sudo rm -rf {}/webstatic'.format(release_path)) 
 
         # Remove the current symbolic link if it exists
         current_link = '/data/web_static/current'
