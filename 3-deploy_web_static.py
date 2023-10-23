@@ -7,8 +7,9 @@ from fabric.api import local
 from fabric.api import put
 from fabric.api import run
 
-env.hosts = ['100.25.34.61', '100.25.180.211']
-
+env.hosts = ['54.164.27.186', '52.86.142.105']
+env.user = 'ubuntu'
+env.key_filename = '~/.ssh/school'
 
 def do_pack():
     """Create a tar gzipped archive of the directory web_static."""
