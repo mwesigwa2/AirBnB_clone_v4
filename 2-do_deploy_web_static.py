@@ -25,17 +25,19 @@ def do_deploy(archive_path):
         run('sudo mkdir -p {}'.format(release_path))
 
         # Uncompress the archive into the release directory
-        run('sudo tar -xzf /tmp/{} -C {}'.format(archive_filename, release_path))
+        run('sudo tar -xzf /tmp/{} -C {}'.format(archive_filename,
+            release_path))
 
         # Delete the uploaded archive from the web servers
         run('sudo rm /tmp/{}'.format(archive_filename))
 
         # move contents into -host web_static
-        rel_path = '/data/web_static/releases/{}/web_static/*'.format(archive_name)
+        rel_path = '/data/web_static/releases/{}/web_static/*'\
+            .format(archive_name)
         run('sudo mv {} {}'.format(rel_path, release_path))
 
         # remove extra web_static dir
-        run('sudo rm -rf {}/webstatic'.format(release_path)) 
+        run('sudo rm -rf {}/webstatic'.format(release_path))
 
         # Remove the current symbolic link if it exists
         current_link = '/data/web_static/current'
