@@ -46,6 +46,7 @@ class DBStorage:
         Return:
             Dict of queried classes in the format <class name>.<obj id> = obj.
         """
+        new_dict = {}
         for clsss in classes:
             if cls is None or cls is classes[clsss] or cls is clsss:
                 objs = self.__session.query(classes[clsss]).all()
@@ -73,7 +74,7 @@ class DBStorage:
         session_factory = sessionmaker(bind=self.__engine,
                                        expire_on_commit=False)
         Session = scoped_session(session_factory)
-        self.__session = Session()
+        self.__session = Session
 
     def close(self):
         """Close the working SQLAlchemy session."""
