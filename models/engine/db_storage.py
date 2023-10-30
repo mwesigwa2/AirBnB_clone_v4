@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """Defines the DBStorage engine."""
 from os import getenv
+import models
 from models.base_model import Base
 from models.base_model import BaseModel
 from models.amenity import Amenity
@@ -13,6 +14,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
+
+classes = {"Amenity": Amenity, "City": City,
+           "Place": Place, "Review": Review, "State": State, "User": User}
 
 
 class DBStorage:
@@ -42,18 +46,13 @@ class DBStorage:
         Return:
             Dict of queried classes in the format <class name>.<obj id> = obj.
         """
-        if cls is None:
-            objs = self.__session.query(State).all()
-            objs.extend(self.__session.query(City).all())
-            objs.extend(self.__session.query(User).all())
-            objs.extend(self.__session.query(Place).all())
-            objs.extend(self.__session.query(Review).all())
-            objs.extend(self.__session.query(Amenity).all())
-        else:
-            if isinstance(cls, str):
-                cls = eval(cls)
-            objs = self.__session.query(cls)
-        return {"{}.{}".format(type(o).__name__, o.id): o for o in objs}
+        for clsss in classes:
+            if cls is None or cls is classes[clsss] or cls is clsss:
+                objs = self.__session.query(classes[clsss]).all()
+                for obj in objs:
+                    key = obj.__class__.__name__ + '.' + obj.id
+                    new_dict[key] = obj
+        return (new_dict)
 
     def new(self, obj):
         """Add obj to the current database session."""
@@ -78,4 +77,15 @@ class DBStorage:
 
     def close(self):
         """Close the working SQLAlchemy session."""
-        self.__session.close()
+        self.__session.remove()
+
+    def get(self, cls, id):
+        """Method to retrieve one object"""
+        if cls is not None:
+            match = self.__session.query(cls).filter(cls.id == id).first()
+            return match
+        return None
+
+    def count(self, cls=None):
+        """ counts the number of objects in the storage """
+        return len(self.all(cls))

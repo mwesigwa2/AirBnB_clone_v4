@@ -18,10 +18,10 @@ class_dict = {
         "BaseModel": BaseModel,
         "User": User,
         "Place": Place,
-        "Amenity": Amenity,
+        "State": State,
         "City": City,
-        "Review": Review,
-        "State": State
+        "Amenity": Amenity,
+        "Review": Review
         }
 
 
@@ -80,8 +80,24 @@ class FileStorage:
             key = "{}.{}".format(obj.__class__.__name__, obj.id)
             if key in self.__objects:
                 del self.__objects[key]
-                self.save()
 
     def close(self):
         """deserializes JSON file to objects"""
         self.reload()
+
+    def get(self, cls, id):
+        """ method to retrieve one object """
+        if cls is not None:
+            match = list(
+                    filter(
+                        lambda x: type(x) is cls and x.id == id,
+                        self.__objects.values()
+                        )
+                    )
+            if match:
+                return match[0]
+        return None
+
+    def count(self, cls=None):
+        """ Counts the number of objects in the storage """
+        return len(self.all(cls))
