@@ -9,10 +9,12 @@ from flask import Flask
 app = Flask(__name__)
 app.register_blueprint(app_views)
 
+
 @app.teardown_appcontext
 def shutdown_everything(exception):
     """Closes and clears everything"""
     storage.close()
+
 
 if __name__ == "__main__":
     port = int(os.getenv("HBNB_API_PORT", 5000))
