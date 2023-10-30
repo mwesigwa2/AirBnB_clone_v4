@@ -46,6 +46,7 @@ class DBStorage:
         Return:
             Dict of queried classes in the format <class name>.<obj id> = obj.
         """
+        new_dict = {}
         for clsss in classes:
             if cls is None or cls is classes[clsss] or cls is clsss:
                 objs = self.__session.query(classes[clsss]).all()
