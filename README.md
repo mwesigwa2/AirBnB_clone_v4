@@ -144,3 +144,9 @@ Usage: <class_name>.update(<_id>, <dictionary>)
 <center> <h1>0x02. AirBnB clone - MySQL</h1> </center>
 This section contains tasks for building a MySQL environment for the AirBnB Clone
 
+# 0x05. AirBnB clone - RESTful API
+REST API is a software architectural style for Backend.
+
+REST = “REpresentational State Transfer”. API = Application Programming Interface
+
+Its purpose is to induce performance, scalability, simplicity, modifiability, visibility, portability, and reliability.
