@@ -14,10 +14,12 @@ classes = {"users": "User", "places": "Place", "states": "State",
            "cities": "City", "amenities": "Amenity",
            "reviews": "Review"}
 
+
 @app_views.route('/status', methods=['GET'], strict_slashes=False)
 def return_status():
     """ Response for a successful fetch """
     return jsonify({"status": "OK"})
+
 
 @app_views.route('/stats', methods=['GET'])
 def return_count():
