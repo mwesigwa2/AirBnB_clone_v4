@@ -14,31 +14,32 @@ def do_get_all_cities(state_id):
     """ Fetching cities of a specific State, or city """
     cities_list = []
     state = storage.get(State, state_id)
-    if state:
-        for city in state.cities:
-            cities_list.append(city.to_dict())
-        return jsonify(cities_list)
-    abort(404)
+    if state is None:
+        abort(404)
+    for city in state.cities:
+        cities_list.append(city.to_dict())
+    return jsonify(cities_list)
 
 
 @app_views.route('/cities/<city_id>/', methods=['GET'], strict_slashes=False)
 def do_get_city(city_id):
     """ Retrieves a specific city based on its ID """
     city = storage.get(City, city_id)
-    if city:
-        return jsonify(city.to_dict())
-    abort(404)
+    if city is None:
+        abort(404)
+    return jsonify(city.to_dict())
 
 
 @app_views.route('/cities/<city_id>', methods=['DELETE'], strict_slashes=False)
 def do_delete_city(city_id):
     """ Deletes a city based on the passed ID """
     city = storage.get(City, city_id)
-    if city:
-        storage.delete(city)
-        storage.save()
-        return make_response(jsonify({}), 200)
-    abort(404)
+    if city is None:
+        abort(404)
+    storage.delete(city)
+    storage.save()
+    return make_response(jsonify({}), 200)
+
 
 
 @app_views.route('/states/<state_id>/cities', methods=['POST'],
