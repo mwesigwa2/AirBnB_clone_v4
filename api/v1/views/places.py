@@ -2,7 +2,8 @@
 """ handles all default RESTFul API actions
     for place objects
 """
-from flask import Flask, request, jsonify, abort
+from flask import Flask, jsonify
+from flask import abort, request
 from api.v1.views import app_views
 from models import storage
 from models.place import Place
@@ -94,20 +95,20 @@ def places_search():
     if data is None:
         return make_response(jsonify({"error": "Not a JSON"}), 400)
 
-    # Extract search criteria from the JSON
+    """ Extract search criteria from the JSON """
     states = data.get('states', [])
     cities = data.get('cities', [])
     amenities = data.get('amenities', [])
 
-    # If all search criteria are empty, retrieve all Place objects
+    """ If all search criteria are empty, retrieve all Place objects """
     if not states and not cities and not amenities:
         places = storage.all(Place).values()
         return jsonify([place.to_dict() for place in places])
 
-    # Retrieve Place objects based on search criteria
+    """ Retrieve Place objects based on search criteria """
     list_places = []
 
-    # Retrieve by states and cities
+    """ Retrieve by states and cities """
     for state_id in states:
         state = storage.get(State, state_id)
         if state:
@@ -120,7 +121,7 @@ def places_search():
         if city:
             list_places.extend(city.places)
 
-    # Filter by amenities
+    """ Filter by amenities """
     if amenities:
         if not list_places:
             list_places = storage.all(Place).values()
