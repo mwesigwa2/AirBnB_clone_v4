@@ -1,62 +1,56 @@
 #!/usr/bin/python3
 """users  file """
 from api.v1.views import app_views
-from flask import jsonify, abort, request
+from flask import jsonify, abort, request, make_response
 from models import storage
 from models.user import User
 from datetime import datetime
 import uuid
 
 
-@app_views.route('/users/', methods=['GET'])
-@app_views.route('/users', methods=['GET'])
+@app_views.route('/users', methods=['GET'], strict_slashes=False)
 def list_users():
-    '''Retrieves a list of all User objects'''
-    list_users = [obj.to_dict() for obj in storage.all("User").values()]
+    """Retrieves a list of all User objects"""
+    list_users = []
+    users = storage.all(User).values()
+    for user in users:
+        list_users.append(user.to_dict())
     return jsonify(list_users)
 
 
-@app_views.route('/users/<user_id>', methods=['GET'])
+@app_views.route('/users/<user_id>', methods=['GET'], strict_slashes=False)
 def get_user(user_id):
     '''Retrieves a User object'''
-    all_users = storage.all("User").values()
-    user_obj = [obj.to_dict() for obj in all_users if obj.id == user_id]
-    if user_obj == []:
-        abort(404)
-    return jsonify(user_obj[0])
+    all_users = storage.get(User, user_id)
+    if all_users:
+        return jsonify(all_users.to_dict())
+    abort(404)
 
 
-@app_views.route('/users/<user_id>', methods=['DELETE'])
+@app_views.route('/users/<user_id>', methods=['DELETE'], strict_slashes=False)
 def delete_user(user_id):
     '''Deletes a User object'''
-    all_users = storage.all("User").values()
-    user_obj = [obj.to_dict() for obj in all_users if obj.id == user_id]
-    if user_obj == []:
-        abort(404)
-    user_obj.remove(user_obj[0])
-    for obj in all_users:
-        if obj.id == user_id:
-            storage.delete(obj)
-            storage.save()
-    return jsonify({}), 200
+    all_users = storage.get(User, user_id)
+    if all_users:
+        storage.delete(all_users)
+        storage.save()
+        return make_response(jsonify({}), 200)
+    abort(404)
 
 
-@app_views.route('/users/', methods=['POST'])
+@app_views.route('/users', methods=['POST'], strict_slashes=False)
 def create_user():
     '''Creates a User'''
-    if not request.get_json():
+    data = request.get_json()
+    if data is None:
         abort(400, 'Not a JSON')
-    if 'email' not in request.get_json():
+    if 'email' not in data:
         abort(400, 'Missing email')
-    if 'password' not in request.get_json():
+    if 'password' not in data:
         abort(400, 'Missing password')
-    users = []
-    new_user = User(email=request.json['email'],
-                    password=request.json['password'])
-    storage.new(new_user)
-    storage.save()
-    users.append(new_user.to_dict())
-    return jsonify(users[0]), 201
+    user = User(**data)
+    user.save()
+    return jsonify(user.to_dict()), 201
 
 
 @app_views.route('/users/<user_id>', methods=['PUT'])
