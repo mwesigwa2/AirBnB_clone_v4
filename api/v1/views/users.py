@@ -1,9 +1,10 @@
 #!/usr/bin/python3
-""" users  file """
-from api.v1.views import app_views
-from flask import jsonify, abort, request, make_response
-from models import storage
+""" default rest API actions for users PUSH, GET, PUT, DELETE """
+from flask import jsonify, abort
+from flask import request, make_response
 from models.user import User
+from api.v1.views import app_views
+from models import storage
 
 
 @app_views.route('/users', methods=['GET'], strict_slashes=False)
@@ -51,7 +52,7 @@ def create_user():
     return jsonify(user.to_dict()), 201
 
 
-@app_views.route('/users/<user_id>', methods=['PUT'])
+@app_views.route('/users/<user_id>', methods=['PUT'], strict_slashes=False)
 def updates_user(user_id):
     """ Updates a User object """
     user = storage.get(User, user_id)
