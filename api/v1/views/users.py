@@ -10,8 +10,8 @@ from models import storage
 @app_views.route('/users', methods=['GET'], strict_slashes=False)
 def list_users():
     """ Retrieves a list of all User objects """
-    list_users = []
     users = storage.all(User).values()
+    list_users = []
     for user in users:
         list_users.append(user.to_dict())
     return jsonify(list_users)
@@ -21,20 +21,20 @@ def list_users():
 def get_user(user_id):
     """ Retrieves a User object """
     user = storage.get(User, user_id)
-    if user:
-        return jsonify(user.to_dict())
-    abort(404)
+    if not user:
+        abort(404)
+    return jsonify(user.to_dict())
 
 
 @app_views.route('/users/<user_id>', methods=['DELETE'], strict_slashes=False)
 def delete_user(user_id):
     """ Deletes a User object """
     user = storage.get(User, user_id)
-    if user:
-        storage.delete(user)
-        storage.save()
-        return make_response(jsonify({}), 200)
-    abort(404)
+    if not user:
+        abort(404)    
+    storage.delete(user)
+    storage.save()
+    return make_response(jsonify({}), 200)
 
 
 @app_views.route('/users', methods=['POST'], strict_slashes=False)
